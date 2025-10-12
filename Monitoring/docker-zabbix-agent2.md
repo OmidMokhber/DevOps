@@ -24,7 +24,7 @@ services:
       # - /etc/zabbix/zabbix_agent2.d:/etc/zabbix/zabbix_agent2.d
     restart: always
 ```
-###In Zabbix host add template Docker by Zabbix agent 2
+### In Zabbix host add template Docker by Zabbix agent 2
 
 If not work uncomment the comment in volume and:
 ```bash
