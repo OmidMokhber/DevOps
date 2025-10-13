@@ -23,3 +23,7 @@ Add the ~/bin directory to your $PATH:
 export PATH=$PATH:$HOME/bin
 echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
 ```
+# Step 5:
+```bash
+crc setup
+```
