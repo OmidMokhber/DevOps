@@ -27,3 +27,12 @@ echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
 ```bash
 crc setup
 ```
+# Step 6:
+### Copy pull secret from this [link](https://console.redhat.com/openshift/create/local) and import
+```bash
+crc start
+```
+#### login to OpenShift in cli
+```bash
+eval $(crc oc-env) oc login -u developer-p developer https://api.crc.testing:6443
+```
