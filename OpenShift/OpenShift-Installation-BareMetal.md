@@ -119,7 +119,16 @@ ssh-add <path>/<file_name>
 #Example output
 #Identity added: /home/<you>/<path>/<file_name> (<computer_name>)
 ```
+```bash
+# Check the agent is running or not
+ps aux | grep ssh-agent
 
+# Check added keys
+ssh-add -l
+
+# kill
+ssh-agent -k
+```
 ```bash
 mkdir <installation_directory>
 ```
@@ -203,7 +212,9 @@ storage:
         rtcsync
         logdir /var/log/chrony
 ```
-
+```bash
+butane 99-master-chrony.bu -o 99-master-chrony.yaml
+```
 ---
 
 ```bash
@@ -258,6 +269,9 @@ Ignition config files are created for the `bootstrap`, `control plane`, and `com
 ├── metadata.json
 └── worker.ign
 ```
+Now you can use the ignition files again. Because these file will be expired after 24 hours.
+
+---
 
 ## We need to spin up and HTTP server. We can do this by utilizing python.
 ```bash
@@ -313,7 +327,9 @@ sudo coreos-installer install \
   /dev/sda --offline
 ```
 
-Install `bootstrap` and `masters`
+Install `bootstrap` and `masters`.
+
+After install complete `reboot` the redhat coreos and `Eject` the iso file.
 
 ---
 
@@ -329,12 +345,13 @@ openshift-install wait-for bootstrap-complete --dir=install-dir --log-level=info
 
 ---
 
-```bash
-export KUBECONFIG=<installation_directory>/auth/kubeconfig
-```
+
 # After this command you should see the `console` url and kubeadmin password
 ```bash
 openshift-install wait-for install-complete --dir=install-dir --log-level=debug
+```
+```bash
+export KUBECONFIG=<installation_directory>/auth/kubeconfig
 ```
 
 ---
@@ -365,22 +382,98 @@ watch -n5 oc get clusteroperators
 ---
 
 # Scaling a user-provisioned cluster with the Bare Metal Operator
-Create a backup:
+**Administrator -> CustomResourceDefinitions -> Provisioning -> Instance -> Create new Provisioning**
+```yaml
+apiVersion: metal3.io/v1alpha1
+kind: Provisioning
+metadata:
+  name: provisioning-configuration
+spec:
+  provisioningNetwork: "Disabled"
+  watchAllNamespaces: false
+```
+```bash
+oc get pods -n openshift-machine-api
+```
+```text
+NAME                                                  READY   STATUS    RESTARTS        AGE
+cluster-autoscaler-operator-678c476f4c-jjdn5          2/2     Running   0               5d21h
+cluster-baremetal-operator-6866f7b976-gmvgh           2/2     Running   0               5d21h
+control-plane-machine-set-operator-7d8566696c-bh4jz   1/1     Running   0               5d21h
+ironic-proxy-64bdw                                    1/1     Running   0               5d21h
+ironic-proxy-rbggf                                    1/1     Running   0               5d21h
+ironic-proxy-vj54c                                    1/1     Running   0               5d21h
+machine-api-controllers-544d6849d5-tgj9l              7/7     Running   1 (5d21h ago)   5d21h
+machine-api-operator-5c4ff4b86d-6fjmq                 2/2     Running   0               5d21h
+metal3-6d98f84cc8-zn2mx                               5/5     Running   0               5d21h
+metal3-image-customization-59d745768d-bhrp7           1/1     Running   0               5d21h
+```
+To deploy with a static configuration, create the following `bmh.yaml` file:
+
+```yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openshift-worker-<num>-network-config-secret 
+  namespace: openshift-machine-api
+type: Opaque
+stringData:
+  nmstate: | 
+    interfaces: 
+    - name: <nic1_name> ### eno3
+      type: ethernet
+      state: up
+      ipv4:
+        address:
+        - ip: <ip_address> 
+          prefix-length: 24 ### 24 means subnet mask is 255.255.255.0
+        enabled: true
+    dns-resolver:
+      config:
+        server:
+        - <dns_ip_address> 
+    routes:
+      config:
+      - destination: 0.0.0.0/0
+        next-hop-address: <next_hop_ip_address> ### IP default gateway
+        next-hop-interface: <next_hop_nic1_name> ### find with `ip route` (ens33)
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openshift-worker-<num>-bmc-secret
+  namespace: openshift-machine-api
+type: Opaque
+data:
+  username: <base64_of_uid-iLO> 
+  password: <base64_of_pwd-iLO>
+---
+apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  name: openshift-worker-<num>
+  namespace: openshift-machine-api
+spec:
+  online: true
+  bootMACAddress: <nic1_mac_address> # iLO MACAddress or eno3 (Not Sure!)
+  bmc:
+    address: <protocol>://<bmc_url> # ipmi://ilo-ipv4
+    credentialsName: openshift-worker-<num>-bmc-secret
+    disableCertificateVerification: false
+  customDeploy:
+    method: install_coreos
+  userData:
+    name: worker-user-data-managed
+    namespace: openshift-machine-api
+  rootDeviceHints:
+    deviceName: <root_device_hint> # /dev/sda
+  preprovisioningNetworkDataName: openshift-worker-<num>-network-config-secret
+```
+
+---
+
+# Create a backup:
 ```bash
 cp -r install-dir install-dir-backup-$(date +%Y%m%d-%H%M)
 ```
-```bash
-openshift-install create ignition-configs --help
-```
-```bash
-openshift-install create manifests --dir install-dir
-```
-Copy `99-master-chrony.yaml` & `99-worker-chrony.yaml` to `install-dir/openshift`
-```bash
-install-dir/openshift/99-master-chrony.yaml
-install-dir/openshift/99-worker-chrony.yaml
-```
-```bash
-openshift-install create ignition-configs --dir <installation_directory> --overwrite
-```
-Now you can use the ignition files again. Because these file will be expired after 24 hours.

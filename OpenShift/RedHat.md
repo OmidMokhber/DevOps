@@ -128,6 +128,36 @@ sudo dnf clean all
 sudo rm -rf /var/cache/dnf
 sudo dnf makecache
 ```
+
+---
+
+# Chrony in Red Hat 9.x
+```bash
+sudo nano /etc/chrony.conf 
+```
+```nano
+server <ntp-ip-address> iburst
+```
+```bash
+sudo firewall-cmd --permanent --add-port=123/udp
+
+sudo firewall-cmd --reload
+```
+```bash
+sudo systemctl status chronyd
+sudo systemctl restart chronyd
+```
+# Verify
+```bash
+chronyc sources -v 
+chronyc tracking 
+```
+You should see the internal NTP server as `NTP source` and the status will show `^*` or `^+` indicating that it is synchronized.
+
+And `Leap status` should be `Normal`.
+
+---
+
 ### Change repo
 > **Find the `dependency` in this [Site](https://rpmfind.net/linux/rpm2html/search.php)**
 #### User epel
@@ -289,3 +319,59 @@ Output should be the vpn ip
 
 ---
 
+# Download rpm and move to air-gap
+In Online Client
+```bash
+sudo dnf install --downloadonly --downloaddir=/tmp/pkgs \
+  libvirt qemu-kvm mkisofs python3-devel jq ipmitool haproxy
+```
+```bash
+tar czvf pkgs.tar.gz /tmp/pkgs
+```
+
+on server air-gap
+```bash
+sudo dnf install -y /path/to/pkgs/*.rpm
+```
+
+---
+
+For example git
+```bash
+mkdir -p ~/git-offline
+cd ~/git-offline
+sudo dnf install -y dnf-plugins-core
+sudo dnf download --resolve git
+```
+In air-gap Client:
+```bash
+cd git-offline
+sudo rpm -Uvh *.rpm
+```
+
+---
+
+# ab - Apache Benchmark
+In Online Client
+```bash
+sudo dnf install --downloadonly --downloaddir=/tmp/httpd-tools httpd-tools
+```
+```bash
+cd /tmp
+tar -czvf httpd-tools.tar.gz httpd-tools
+```
+```bash
+scp /tmp/httpd-tools.tar.gz /tmp/httpd-tools.tar.gz user@airgap:/tmp/
+```
+In air-gap Client:
+```bash
+cd /tmp
+tar -xzvf httpd-tools.tar.gz
+```
+```bash
+sudo dnf install /tmp/httpd-tools/*.rpm
+```
+```bash
+which ab
+ab -V
+```
