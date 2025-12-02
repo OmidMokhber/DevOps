@@ -27,6 +27,10 @@ sudo passwd username
 ```bash
 sudo usermod -aG sudo username
 ```
+### Adding the User to the sudo Group (RedHat)
+```bash
+sudo usermod -aG wheel username
+```
 ### Switch to User
 ```bash
 sudo -u username -i
@@ -43,6 +47,44 @@ sudo -s
 ```bash
 sudo usermod -aG wheel username
 ```
+
+---
+
+# Change username
+```bash
+# Switch to root
+sudo -i
+
+# Close all saeed sessions and processes
+pkill -u olduser
+killall -u olduser
+
+who | grep olduser
+
+pkill -KILL -u olduser
+```
+```bash
+usermod -l newuser olduser
+```
+
+## Change home directory
+The `-m` parameter will move the contents of `/home/olduser` to `/home/newuser`.
+```bash
+usermod -d /home/newuser -m newuser
+```
+### Verify
+```bash
+id newuser
+echo ~newuser
+```
+```bash
+grep vahid /etc/passwd
+```
+Output:
+```bash
+newuser:x:1001:1001::/home/newuser:/bin/bash
+```
+Logout and Login!
 
 ---
 
@@ -72,6 +114,8 @@ nmcli device status
 nmcli device show
 ```
 ```bash
+netstat -na    # show all ports
+netstat -na | grep LISTEN
 netstat -tulnp # show usage port
 > grep -o done logfile.log | wc -l # count "done" word in log file
 ```
@@ -110,6 +154,18 @@ zip -r archive_name.zip /path/to/directory
 tar -xzvf archive_name.tar.gz -C directory
 unzip archive_name.zip
 ```
+```bash
+sudo tar -cpf file-name.tar -C /path/to/directory .
+```
+* `c` = compress
+* `p` = hold premission
+* `f` = file name
+* `.` = just files in this directory
+
+```bash
+tar -xpf file-name.tar -C /dest/path/
+```
+* `x` = extract
 
 ---
 
