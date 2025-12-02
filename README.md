@@ -10,3 +10,5 @@ Welcome to DevOps project repository! Here, I aim to share experiences, insights
 - **Monitoring and Logging**: Best practices for setting up effective monitoring and logging systems.
 - **Case Studies**: Real-world case studies and lessons learned from past projects.
 - **Troubleshooting**: Common issues and troubleshooting techniques.
+
+Special thanks to [Saeed](https://github.com/Saeed7596)
