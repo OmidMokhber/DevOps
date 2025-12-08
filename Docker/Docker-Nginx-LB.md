@@ -27,11 +27,13 @@ http {
     }
 }
 ```
+``` bash
 docker run -d \
   --name nginx-lb \
   -p 80:80 \
   -v /opt/lb/nginx.conf:/etc/nginx/nginx.conf \
   nginx:latest
+```
 
 4. Config /etc/keepalived/keepalived.conf vm1
 ``` nano
