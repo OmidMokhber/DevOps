@@ -27,6 +27,24 @@ http {
     }
 }
 ```
+nginx-compose
+``` vim
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_lb
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+#    network_mode: "host"
+    networks:
+      - nginx_net
+    restart: always
+networks:
+  nginx_net:
+    driver: bridge
+```
 ``` bash
 docker run -d \
   --name nginx-lb \
@@ -37,59 +55,31 @@ docker run -d \
 
 4. Config /etc/keepalived/keepalived.conf vm1
 ``` nano
-vrrp_script chk_nginx {
-    script "/usr/bin/docker ps | grep nginx-lb"
-    interval 2
-}
-
 vrrp_instance VI_1 {
-    interface eth0
     state MASTER
-    virtual_router_id 52
-    priority 150
+    interface ens33  # یا نام اینترفیس شبکه شما
+    virtual_router_id 51
+    priority 101
     advert_int 1
-
-    authentication {
-        auth_type PASS
-        auth_pass 1234
-    }
-
     virtual_ipaddress {
         172.29.98.130
     }
-
-    track_script {
-        chk_nginx
-    }
 }
+
 ```
 5. Config /etc/keepalived/keepalived.conf vm2
 ``` nano
-vrrp_script chk_nginx {
-    script "/usr/bin/docker ps | grep nginx-lb"
-    interval 2
-}
-
 vrrp_instance VI_1 {
-    interface eth0
     state BACKUP
-    virtual_router_id 52
+    interface ens33  # یا نام اینترفیس شبکه شما
+    virtual_router_id 51
     priority 100
     advert_int 1
-
-    authentication {
-        auth_type PASS
-        auth_pass 1234
-    }
-
     virtual_ipaddress {
         172.29.98.130
     }
-
-    track_script {
-        chk_nginx
-    }
 }
+
 ```
 6. restart
 ``` bash
