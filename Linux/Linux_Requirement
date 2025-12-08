@@ -1,0 +1,4 @@
+install these
+``` bash
+vim nano git curl wget zip unzip tar which bash-completion net-tools bind-utils lsof telnet tree rsync openssl htop
+```
