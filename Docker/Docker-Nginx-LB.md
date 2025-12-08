@@ -46,11 +46,7 @@ networks:
     driver: bridge
 ```
 ``` bash
-docker run -d \
-  --name nginx-lb \
-  -p 80:80 \
-  -v /opt/lb/nginx.conf:/etc/nginx/nginx.conf \
-  nginx:latest
+ docker compose -f nginx-compose.yaml up -d
 ```
 
 4. Config /etc/keepalived/keepalived.conf vm1
