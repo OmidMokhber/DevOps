@@ -15,8 +15,8 @@ events {}
 
 http {
     upstream backend {
-        server 10.0.0.10:8080;
-        server 10.0.0.11:8080;
+        server 10.0.0.10:8080; #nginx1 ip
+        server 10.0.0.11:8080; #nginx2 ip
     }
 
     server {
@@ -37,7 +37,6 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-#    network_mode: "host"
     networks:
       - nginx_net
     restart: always
@@ -53,7 +52,7 @@ networks:
 ``` nano
 vrrp_instance VI_1 {
     state MASTER
-    interface ens33  # یا نام اینترفیس شبکه شما
+    interface ens33 
     virtual_router_id 51
     priority 101
     advert_int 1
