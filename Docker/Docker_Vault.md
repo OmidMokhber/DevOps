@@ -1,5 +1,11 @@
 1. Install Docker
-2. Tree
+``` bash
+sudo dnf -y install dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
+```
+3. Tree
 ``` tree
 .
 └── vault-docker-compose
@@ -89,3 +95,4 @@ networks:
 ``` bash
 docker compose -f vault-compose.yaml up -d
 ```
+6. use https://ip:8200/ui for 
