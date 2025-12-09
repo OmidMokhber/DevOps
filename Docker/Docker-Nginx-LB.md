@@ -49,7 +49,7 @@ networks:
 ```
 
 4. Config /etc/keepalived/keepalived.conf vm1
-``` nano
+``` vim
 vrrp_instance VI_1 {
     state MASTER
     interface ens33 
@@ -63,10 +63,10 @@ vrrp_instance VI_1 {
 
 ```
 5. Config /etc/keepalived/keepalived.conf vm2
-``` nano
+``` vim
 vrrp_instance VI_1 {
     state BACKUP
-    interface ens33  # یا نام اینترفیس شبکه شما
+    interface ens33
     virtual_router_id 51
     priority 100
     advert_int 1
