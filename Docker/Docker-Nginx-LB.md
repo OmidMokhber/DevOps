@@ -57,7 +57,7 @@ vrrp_instance VI_1 {
     priority 101
     advert_int 1
     virtual_ipaddress {
-        172.29.98.130
+        x.x.x.x
     }
 }
 
@@ -71,7 +71,7 @@ vrrp_instance VI_1 {
     priority 100
     advert_int 1
     virtual_ipaddress {
-        172.29.98.130
+        x.x.x.x
     }
 }
 
