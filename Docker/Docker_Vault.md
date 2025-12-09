@@ -17,35 +17,30 @@ sudo systemctl enable --now docker
 ```
 3. Config vault-config.hcl
 ``` yaml
-# پیکربندی Vault برای استفاده از Consul به عنوان backend
+
 storage "consul" {
   address = "http://consul:8500"  # آدرس Consul
   path    = "vault/"
   scheme  = "http"
 }
 
-# Listener تنظیم شده برای استفاده از TLS
 listener "tcp" {
   address = "0.0.0.0:8200"
   tls_cert_file = "/vault/tls/vault-cert.pem"  # مسیر گواهینامه سرور
   tls_key_file  = "/vault/tls/vault-key.pem"   # مسیر کلید خصوصی
 }
 
-# listener دوم برای cluster communication
 listener "tcp" {
   address     = "0.0.0.0:8201"
   tls_cert_file = "/vault/tls/vault-cert.pem"
   tls_key_file  = "/vault/tls/vault-key.pem"
 }
 
-# غیر فعال کردن MLock (برای جلوگیری از مشکلات در Docker)
 disable_mlock = true
 
-# پیکربندی API و Cluster
-api_addr = "https://172.29.98.156:8200"  # آدرس API Vault
-cluster_addr = "https://172.29.98.156:8201"  # آدرس Cluster Vault
+api_addr = "https://x.x.x.x:8200"  # آدرس API Vault
+cluster_addr = "https://x.x.x.x:8201"  # آدرس Cluster Vault
 
-# فعال کردن UI
 ui = true
 ```
 4. Config vault-compose.yaml
@@ -58,7 +53,7 @@ services:
       - "8200:8200"
       - "8201:8201"
     #environment:
-    #  - VAULT_ADDR=https://172.29.98.156:8200
+    #  - VAULT_ADDR=https://x.x.x.x:8200
     #  - VAULT_DEV_ROOT_TOKEN_ID=root
     volumes:
       - ./vault-config.hcl:/vault/config/vault-config.hcl
@@ -99,4 +94,4 @@ openssl req -newkey rsa:4096 -nodes -keyout vault-key.pem -x509 -out vault-cert.
 ``` bash
 docker compose -f vault-compose.yaml up -d
 ```
-7. use https://ip:8200/ui for 
+7. use https://x.x.x.x:8200/ui for 
