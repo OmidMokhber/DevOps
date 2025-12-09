@@ -91,8 +91,12 @@ networks:
   vault-network:
     driver: bridge
 ```
-5.
+5.Create TLS
+```bash
+openssl req -newkey rsa:4096 -nodes -keyout vault-key.pem -x509 -out vault-cert.pem
+```
+6.
 ``` bash
 docker compose -f vault-compose.yaml up -d
 ```
-6. use https://ip:8200/ui for 
+7. use https://ip:8200/ui for 
