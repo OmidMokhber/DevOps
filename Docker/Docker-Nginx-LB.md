@@ -10,7 +10,7 @@ sudo dnf install keepalived -y
 sudo systemctl enable keepalived
 ```
 3. /opt/lb/nginx.conf vm1
-``` nano
+``` vim
 events {}
 
 http {
